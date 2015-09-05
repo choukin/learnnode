@@ -12,7 +12,7 @@ app.set('views','./views/pages')//设置试图的根目录
 app.set('view engine','jade')//设置默认的模板引擎
 app.use(bodyParser.urlencoded({extended:false}))//格式化表单里的数据
 app.use(express.static(path.join(__dirname,'bower_components')))//静态资源所在目录
-app.listen(port，host)//监听端口
+app.listen(port,host)//监听端口
 
 console.log('imooc started on port '+ port)//打印日志
 
