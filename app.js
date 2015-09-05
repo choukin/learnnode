@@ -1,4 +1,12 @@
-var express = require('express')//加载express模块
+ var port = (process.env.VMC_APP_PORT || 3000);
+ var host = (process.env.VCAP_APP_HOST || 'localhost');
+ var http = require('express');
+ var app = http.createServer();
+ app.get('/', function(req, res) {
+    res.send('Hello from MoPaaS');
+    });
+ app.listen(port, host);
+/*var express = require('express')//加载express模块
 var bodyParser = require('body-parser')//
 var path = require('path')//path 告诉页面去bower_components下面去查找样式和js
 var mongoose = require('mongoose')//导入mongoose工具模块
@@ -92,4 +100,4 @@ app.get('/admin/list',function(req,res){
 			summary:'伊桑·亨特（汤姆·克鲁斯饰演）将与他的团队一起遭到一个名为“神秘国度”的组织追杀，对方是与他们同样技艺高超的劲敌，试图摧毁阿汤哥所在的“不可能任务情报署”(IMF)。西蒙·佩吉、杰瑞米·雷纳、文·瑞姆斯三位老搭档悉数回归，接应伊桑·亨特共赴这场不可能的任务'
 		}]
 	})
-})
+})*/
