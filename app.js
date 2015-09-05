@@ -2,62 +2,62 @@ var express = require('express')//加载express模块
 var bodyParser = require('body-parser')//
 var path = require('path')//path 告诉页面去bower_components下面去查找样式和js
 var mongoose = require('mongoose')//导入mongoose工具模块
-var _ = require('underscore')//
-var Movie = require('./models/movie')
 var port  = process.env.PORT || 3000//process 是全局变量用来获取外围设置的变量或者传入的参数
+var host = (process.env.VCAP_APP_HOST || 'localhost');
 var app = express()//启动web服务器
 
 mongoose.connect('mongodb://localhost/imooc')//链接数据库
 
 app.set('views','./views/pages')//设置试图的根目录
 app.set('view engine','jade')//设置默认的模板引擎
-app.use(bodyParser.urlencoded({extended:true}))//格式化表单里的数据
-//app.use(bodyParser.json())
- 
-
-//app.use(express.static(path.join(__dirname,'bower_components')))//静态资源所在目录
-app.use(express.static(path.join(__dirname,'public')))
-app.locals.moment = require('moment')
-app.listen(port)//监听端口
+app.use(bodyParser.urlencoded({extended:false}))//格式化表单里的数据
+app.use(express.static(path.join(__dirname,'bower_components')))//静态资源所在目录
+app.listen(port，host)//监听端口
 
 console.log('imooc started on port '+ port)//打印日志
 
 //路由
 //index page
 app.get('/',function(req,res){
-	console.log("indexpage");
-	Movie.fetch(function(err,movies){
-		console.log("indexpage2");
-		if(err){
-			console.log(err)
-			console.log("indexpage4");
-		}
-		console.log("indexpage3");
-		res.render('index',{
+	res.render('index',{
 		title:'imooc 首页',
-		movies:movies
+		movies:[{
+			title:'碟中谍5',
+			_id:1,
+			poster:"http://image11.m1905.cn/uploadfile/2015/0831/thumb_1_1000_510_5_20150831112818472169.jpg"
+		},{
+			title:'碟中谍5',
+			_id:2,
+			poster:"http://image11.m1905.cn/uploadfile/2015/0831/thumb_1_1000_510_5_20150831112818472169.jpg"
+		},{
+			title:'碟中谍5',
+			_id:3,
+			poster:"http://image11.m1905.cn/uploadfile/2015/0831/thumb_1_1000_510_5_20150831112818472169.jpg"
+		},{
+			title:'碟中谍5',
+			_id:4,
+			poster:"http://image11.m1905.cn/uploadfile/2015/0831/thumb_1_1000_510_5_20150831112818472169.jpg"
+		}]
 	})
-	})
-	/*	res.render('index',{
-		title:'imooc 首页',
-		movies:[]
-	})*/
 })
 
 
 
 //detail page
-app.get('/movie/:id',function(req,res){
-	var id = req.params.id
-	Movie.findById(id,function(err,movie){
-		if(err){
-			console.log(err)
-		} 
-		console.log("detail");
-		res.render('detail',{
+app.get('/movies/:id',function(req,res){
+	res.render('detail',{
 		title:'imooc 详情页',
-		movie:movie
-	})
+		movie:{
+			_id:'1',
+			doctor:'克里斯托夫·迈考利',
+			country:'美国',
+			title:'碟中谍5',
+			year:'2015',
+			poster:'http://image11.m1905.cn/uploadfile/2015/0831/thumb_1_1000_510_5_20150831112818472169.jpg',
+			language:'英语',
+			flash:'http://www.iqiyi.com/common/flashplayer/20150820/EnjoyPlayer_4_2_4_c3_3_7_3.swf?vid=21db295eda2b2d69651067b8679f9809&pageURL=w_19rthvgm5x.swf&albumId=4355563609&tvId=4355563609&isPurchase=0&cnId=7&share_sTime=0&share_eTime=139&source=',
+			summary:'伊桑·亨特（汤姆·克鲁斯饰演）将与他的团队一起遭到一个名为“神秘国度”的组织追杀，对方是与他们同样技艺高超的劲敌，试图摧毁阿汤哥所在的“不可能任务情报署”(IMF)。西蒙·佩吉、杰瑞米·雷纳、文·瑞姆斯三位老搭档悉数回归，接应伊桑·亨特共赴这场不可能的任务'
+		}
 	})
 })
 
@@ -78,89 +78,18 @@ app.get('/admin/move',function(req,res){
 	})
 })
 
-//admin update movie
-app.post('/admin/update/:id',function(req,res){
-	var id = req.body.movie.id
-	if(id){
-		Movie.findById(id,function(err,movie){
-			res.render('admin',{
-				title: 'imooc 后台更新页面',
-				movie:movie
-			})
-		})
-	}
-})
-
-//admin post movie
-app.post('/admin/movie/new',function(req,res){
-		//console.log(req.body.movie._id)
-	console.log(JSON.stringify(req.body.movie))
-if (!req.body) return res.sendStatus(400)
-	var id= req.body.movie._id
-	var movieObj = req.body.movie
-	var _movie
-	if (id!=='undefined'){
-		Movie.findById(id,function(err,movie){
-			if (err){
-				console.log(err)
-			}
-			_movie = _.extend(movie,movieObj)
-			_movie.save(function(err,movie){
-				if (err) {
-					console.log(err)
-				}
-				res.redirect('/movie/'+movie._id)//保存成功跳转到详情页面
-			})
-		})
-	}else{
-		_movie = new Movie({
-			doctor:movieObj.doctor,
-			title:movieObj.title,
-			country:movieObj.country,
-			language:movieObj.language,
-			year:movieObj.year,
-			poster:movieObj.poster,
-			summary: movieObj.summary,
-			flash: movieObj.flash
-		})
-		
-		_movie.save(function(err,movie){
-			if (err) {
-					console.log(err)
-				}
-				res.redirect('/movie/'+movie._id)//保存成功跳转到详情页面
-		})
-	}
-})
-
 //list page
 app.get('/admin/list',function(req,res){
-	Movie.fetch(function(err,movies){
-		if(err){
-			console.log(err)
-		}
-		res.render('list',{
-			title:'imooc 列表页面',
-			movies:movies
-		})
+	res.render('list',{
+		title:'imooc 列表页面',
+		movies:[{_id:'1',
+			doctor:'克里斯托夫·迈考利',
+			country:'美国',
+			title:'碟中谍5',
+			year:'2015',
+			language:'英语',
+			flash:'http://www.iqiyi.com/common/flashplayer/20150820/EnjoyPlayer_4_2_4_c3_3_7_3.swf?vid=21db295eda2b2d69651067b8679f9809&pageURL=w_19rthvgm5x.swf&albumId=4355563609&tvId=4355563609&isPurchase=0&cnId=7&share_sTime=0&share_eTime=139&source=',
+			summary:'伊桑·亨特（汤姆·克鲁斯饰演）将与他的团队一起遭到一个名为“神秘国度”的组织追杀，对方是与他们同样技艺高超的劲敌，试图摧毁阿汤哥所在的“不可能任务情报署”(IMF)。西蒙·佩吉、杰瑞米·雷纳、文·瑞姆斯三位老搭档悉数回归，接应伊桑·亨特共赴这场不可能的任务'
+		}]
 	})
-
-})
-
-//list detele moive
-app.delete('/admin/list',function(req,res){
-	var id = req.query.id
-	console.log(id);
-	if(id){
-		Movie.remove({_id:id},function(err,movie){
-			console.log(JSON.stringify(movie));
-			if(err){
-				console.log(err);
-			}else{
-				res.json({success:'1'})
-			}
-			
-		})
-	}
-	
 })
