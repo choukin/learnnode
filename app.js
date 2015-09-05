@@ -44,7 +44,7 @@ app.get('/',function(req,res){
 
 
 //detail page
-app.get('/movies/:id',function(req,res){
+app.get('/movie/:id',function(req,res){
 	res.render('detail',{
 		title:'imooc 详情页',
 		movie:{
