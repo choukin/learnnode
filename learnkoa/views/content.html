@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<div>
+    <p>version:<%= version%></p>
+    <p>now:<%: now() | format%></p>
+    <p>ip: <%= ip%></p>
+    <% var cb = yield callback()%>
+    <p>callbackGen:<%= callbackGen()%></p>
+    <p>callback:<%- cb%></p>
+    <p><%=: users | map :'name' | join%></p>
+</div>
+</body>
+</html>
